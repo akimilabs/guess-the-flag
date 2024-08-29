@@ -22,6 +22,8 @@
         <img src="<%= lastFlagUrl %>" alt="Flag" width="100">
       <% } %>
     </td></tr>
+    <tr><td colspan="2"><strong>Scores</strong> Correct: <%= correctCount %>, Incorrect: <%= incorrectCount %>
+    </td></tr>
     </table>
 
   <form action="/guess" method="POST">
@@ -42,11 +44,7 @@
   </form>
 
   <hr>
-
-  <h4>Scores</h4>
-  <p>Correct: <%= correctCount %></p>
-  <p>Incorrect: <%= incorrectCount %></p>
-
+  
   <form action="/reset" method="POST">
     <button type="submit">Reset Scores</button>
   </form>
