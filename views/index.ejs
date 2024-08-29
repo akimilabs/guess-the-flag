@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guess the Flag</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Guess the Flag</h1>
+  <% if (flagUrl) { %>
+    <img src="<%= flagUrl %>" alt="Flag" width="300">
+  <% } else { %>
+    <p>Flag image not available.</p>
+  <% } %>
+
+  <form action="/guess" method="POST">
+    <input type="hidden" name="country" value="<%= country %>">
+    <label for="guess">Your Guess:</label>
+    <div>
+      <% options.forEach(option => { %>
+        <button type="submit" name="guess" value="<%= option %>"><%= option %></button>
+      <% }) %>
+    </div>
+  </form>
+
+  <h2>Scores</h2>
+  <p>Correct: <%= correctCount %></p>
+  <p>Incorrect: <%= incorrectCount %></p>
+
+  <form action="/reset" method="POST">
+    <button type="submit">Reset Scores</button>
+  </form>
+</body>
+</html>
