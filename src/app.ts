@@ -130,6 +130,9 @@ app.post('/guess', (req: Request, res: Response) => {
 app.post('/reset', (req: Request, res: Response) => {
   correctCount = 0;
   incorrectCount = 0;
+  lastCorrectCountry = '';
+  lastGuessWasCorrect = false;
+  lastFlagUrl = '';
   res.redirect('/');
 });
 
