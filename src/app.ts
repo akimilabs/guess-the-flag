@@ -1,27 +1,31 @@
 import express, { Request, Response } from 'express';
 import axios from 'axios';
 import path from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 let correctCount = 0;
 let incorrectCount = 0;
+let lastCorrectCountry = '';
 
 const countries = [
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria',
   'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan',
-  'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cambodia',
-  'Cameroon', 'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo, Democratic Republic of the', 'Congo, Republic of the',
+  'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cambodia',
+  'Cameroon', 'Canada', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo, Democratic Republic of the', 'Congo, Republic of the',
   'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czech Republic', 'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador',
   'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia', 'Fiji', 'Finland', 'France',
   'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau',
   'Guyana', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland',
   'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Korea, North', 'Korea, South',
   'Kosovo', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein',
-  'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania',
+  'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Mauritania',
   'Mauritius', 'Mexico', 'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar',
-  'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Macedonia', 'Norway',
+  'Namibia', 'Nauru', 'Nepal', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Macedonia', 'Norway',
   'Oman', 'Pakistan', 'Palau', 'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland',
   'Portugal', 'Qatar', 'Romania', 'Russia', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino',
   'Sao Tome and Principe', 'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands',
@@ -30,6 +34,8 @@ const countries = [
   'Turkmenistan', 'Tuvalu', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan', 'Vanuatu',
   'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
 ];
+
+const countries_no_flags = ['Marshall Islands', 'Cabo Verde', 'Netherlands', 'Central African Republic'];
 
 interface WikiPage {
   pageid: number;
@@ -65,11 +71,20 @@ async function fetchFlag(country: string): Promise<string | null> {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, '../public')));
+
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', async (req: Request, res: Response) => {
   const randomCountry = countries[Math.floor(Math.random() * countries.length)];
-  const flagUrl = await fetchFlag(randomCountry);
+  const urlencodedCountry = encodeURIComponent(randomCountry);
+  const flagUrl = await fetchFlag(urlencodedCountry);
+
+  if (!flagUrl) {
+    console.error(`Flag not found for ${randomCountry}`);
+    return res.redirect('/');
+  }
 
   // Generate 5 random incorrect options
   const incorrectOptions = new Set<string>();
@@ -90,14 +105,17 @@ app.get('/', async (req: Request, res: Response) => {
     options,
     correctCount,
     incorrectCount,
+    lastCorrectCountry
   });
 });
 
 app.post('/guess', (req: Request, res: Response) => {
   const { country, guess } = req.body;
   if (country === guess) {
+    lastCorrectCountry = '';
     correctCount++;
   } else {
+    lastCorrectCountry = country;
     incorrectCount++;
   }
   res.redirect('/');

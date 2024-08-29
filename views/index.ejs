@@ -24,6 +24,10 @@
     </div>
   </form>
 
+  <% if (lastCorrectCountry) { %>
+    <p style="color: red;">It was <%= lastCorrectCountry %>!</p>
+  <% } %>
+
   <h2>Scores</h2>
   <p>Correct: <%= correctCount %></p>
   <p>Incorrect: <%= incorrectCount %></p>
