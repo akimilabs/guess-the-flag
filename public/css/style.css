@@ -1,21 +1,29 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    margin: 50px;
+    margin: 20px;
+    padding: 0;
   }
   
   img {
     border: 1px solid #ccc;
     margin-bottom: 20px;
+    max-width: 100%;
+    height: auto;
   }
   
   label {
     font-weight: bold;
+    display: block;
+    margin-top: 10px;
   }
   
   input[type="text"] {
     padding: 5px;
     margin: 10px 0;
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
   }
   
   button {
@@ -24,9 +32,33 @@ body {
     color: #fff;
     border: none;
     cursor: pointer;
+    width: 100%;
+    max-width: 200px;
+    box-sizing: border-box;
   }
   
   button:hover {
     background-color: #0056b3;
   }
-  
+
+  .button-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .button-row button {
+    margin: 5px;
+  }
+
+  table {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    border-collapse: collapse;
+  }
+
+  td, th {
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
