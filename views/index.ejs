@@ -29,7 +29,6 @@
   <form action="/guess" method="POST">
     <input type="hidden" name="country" value="<%= country %>">
     <input type="hidden" name="flagUrl" value="<%= flagUrl %>">
-    <label for="guess">Your Guess:</label>
     <div>
       <% options.forEach((option, index) => { %>
         <% if (index % 3 === 0) { %>
