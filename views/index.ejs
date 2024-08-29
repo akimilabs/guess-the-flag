@@ -8,11 +8,21 @@
 </head>
 <body>
   <h1>Guess the Flag</h1>
-  <% if (flagUrl) { %>
-    <img src="<%= flagUrl %>" alt="Flag" width="300">
-  <% } else { %>
-    <p>Flag image not available.</p>
-  <% } %>
+  <table border="1" align="center">
+    <tr valign="top"><td width="70%">
+      <img src="<%= flagUrl %>" alt="Flag" width="300">
+    </td><td>
+      <% if (lastCorrectCountry) { %>
+        <h4>Last Guess</h4>
+        <% if (lastGuessWasCorrect) { %>
+          <p style="color: green;">Yes, it was <%= lastCorrectCountry %>!</p>
+        <% } else { %>
+          <p style="color: red;">No, it was <%= lastCorrectCountry %>.</p>
+        <% } %>
+        <img src="<%= lastFlagUrl %>" alt="Flag" width="100">
+      <% } %>
+    </td></tr>
+    </table>
 
   <form action="/guess" method="POST">
     <input type="hidden" name="country" value="<%= country %>">
@@ -33,25 +43,9 @@
 
   <hr>
 
-  <table border="1" align="center">
-  <tr valign="top"><td width="50%">
-    <h4>Scores</h4>
-    <p>Correct: <%= correctCount %></p>
-    <p>Incorrect: <%= incorrectCount %></p>
-  </td><td>
-    <% if (lastCorrectCountry) { %>
-      <h4>Last Guess</h4>
-      <% if (lastGuessWasCorrect) { %>
-        <p style="color: green;">Yes, it was <%= lastCorrectCountry %>!</p>
-      <% } else { %>
-        <p style="color: red;">No, it was <%= lastCorrectCountry %>.</p>
-      <% } %>
-      <img src="<%= lastFlagUrl %>" alt="Flag" width="100">
-    <% } %>
-  </td></tr>
-
-  </table>
-  <p></p>
+  <h4>Scores</h4>
+  <p>Correct: <%= correctCount %></p>
+  <p>Incorrect: <%= incorrectCount %></p>
 
   <form action="/reset" method="POST">
     <button type="submit">Reset Scores</button>
