@@ -11,6 +11,8 @@ const port = process.env.PORT || 3000;
 let correctCount = 0;
 let incorrectCount = 0;
 let lastCorrectCountry = '';
+let lastGuessWasCorrect = false;
+let lastFlagUrl = '';
 
 const countries = [
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria',
@@ -105,17 +107,21 @@ app.get('/', async (req: Request, res: Response) => {
     options,
     correctCount,
     incorrectCount,
-    lastCorrectCountry
+    lastCorrectCountry,
+    lastGuessWasCorrect,
+    lastFlagUrl
   });
 });
 
 app.post('/guess', (req: Request, res: Response) => {
-  const { country, guess } = req.body;
+  const { country, guess, flagUrl } = req.body;
+  lastCorrectCountry = country;
+  lastFlagUrl = flagUrl;
   if (country === guess) {
-    lastCorrectCountry = '';
+    lastGuessWasCorrect = true;
     correctCount++;
   } else {
-    lastCorrectCountry = country;
+    lastGuessWasCorrect = false;
     incorrectCount++;
   }
   res.redirect('/');
