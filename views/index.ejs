@@ -10,31 +10,33 @@
   <h1>Guess the Flag</h1>
   <table border="1" align="center">
     <tr valign="middle"><td width="70%">
-      <img src="<%= flagUrl %>" alt="Flag" width="300">
+      <img id="flag" src="<%= flagUrl %>" alt="Flag" width="300">
     </td><td>
       <% if (lastCorrectCountry) { %>
         <h4>Last Guess</h4>
         <% if (lastGuessWasCorrect) { %>
-          <p style="color: green;">Yes, it was <%= lastCorrectCountry %>!</p>
+          <p id="last-guess" style="color: green;">Yes, it was <%= lastCorrectCountry %>!</p>
         <% } else { %>
-          <p style="color: red;">No, it was <%= lastCorrectCountry %>.</p>
+          <p id="last-guess" style="color: red;">No, it was <%= lastCorrectCountry %>.</p>
         <% } %>
-        <img src="<%= lastFlagUrl %>" alt="Flag" width="100">
+        <img id="last-flag" src="<%= lastFlagUrl %>" alt="Flag" width="100">
       <% } %>
     </td></tr>
-    <tr><td colspan="2"><strong>Scores</strong> Correct: <%= correctCount %>, Incorrect: <%= incorrectCount %>
+    <tr><td colspan="2"><strong>Scores</strong> Correct: <span id="correct-count"><%= correctCount %></span>, Incorrect: <span id="incorrect-count"><%= incorrectCount %></span>
     </td></tr>
-    </table>
+  </table>
 
-  <form action="/guess" method="POST">
-    <input type="hidden" name="country" value="<%= country %>">
-    <input type="hidden" name="flagUrl" value="<%= flagUrl %>">
+  <form id="guess-form" action="/guess" method="POST">
+    <input type="hidden" name="countryCode" value="<%= country.code %>">
+    <input type="hidden" name="countryName" value="<%= country.name %>">
+    <input type="hidden" name="correctCount" value="<%= correctCount %>">
+    <input type="hidden" name="incorrectCount" value="<%= incorrectCount %>">
     <div>
       <% options.forEach((option, index) => { %>
         <% if (index % 3 === 0) { %>
           <div class="button-row" style="margin-bottom: 10px;">
         <% } %>
-        <button type="submit" name="guess" value="<%= option %>"><%= option %></button>
+        <button type="submit" name="guessCode" value="<%= option.code %>"><%= option.name %></button>
         <% if (index % 3 === 2 || index === options.length - 1) { %>
           </div>
         <% } %>
@@ -47,5 +49,27 @@
   <form action="/reset" method="POST">
     <button type="submit">Reset Scores</button>
   </form>
+
+  <script>
+    document.getElementById('guess-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = new FormData(this);
+      fetch('/guess', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('flag').src = data.flagUrl;
+        document.getElementById('correct-count').textContent = data.correctCount;
+        document.getElementById('incorrect-count').textContent = data.incorrectCount;
+        if (data.lastCorrectCountry) {
+          document.getElementById('last-guess').textContent = data.lastGuessWasCorrect ? `Yes, it was ${data.lastCorrectCountry}!` : `No, it was ${data.lastCorrectCountry}.`;
+          document.getElementById('last-guess').style.color = data.lastGuessWasCorrect ? 'green' : 'red';
+          document.getElementById('last-flag').src = data.lastFlagUrl;
+        }
+      });
+    });
+  </script>
 </body>
 </html>
