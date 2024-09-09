@@ -82,12 +82,16 @@ function generatePreviousCountryCodes(): string[] {
   }
   
   function generateEasyDifficultyCodes(): string[] {
+    return generateCodesByCountryArea(1000000);
+  }
+
+  function generateCodesByCountryArea(area_min: number, area_max: number | null = null): string[] {
     const codes: string[] = [];
     const countryData = require('./restcountriescom-list.json');
   
     countryData.forEach((country: any) => {
       if (country.cca2 && country.name && country.name.common) {
-        if (country.area > 1000000 && country.area < 10000000) {
+        if (country.area > area_min && (area_max ? (country.area < area_max) : true)) {
           codes.push(country.cca2);
         }
       }
@@ -119,4 +123,4 @@ function generatePreviousCountryCodes(): string[] {
     return country_code_names;
   }
 
-export { CountryCodeName, generateFlagUrl, generateFlagUrlFromCode, generateCountryOptions, generateNewCountry, generatePreviousCountryCodes, generateEasyDifficultyCodes, load_country_code_names };
+export { CountryCodeName, generateFlagUrl, generateFlagUrlFromCode, generateCountryOptions, generateNewCountry, generatePreviousCountryCodes, generateEasyDifficultyCodes, generateCodesByCountryArea, load_country_code_names };

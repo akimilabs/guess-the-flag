@@ -63,7 +63,7 @@
       const guessCode = event.submitter.value;
       formObject['guessCode'] = guessCode;
 
-      console.log('request data:', formObject);
+      console.debug('request data:', formObject);
       console.debug('JSON.stringify(formObject):', JSON.stringify(formObject));
 
       fetch('/guess', {
@@ -84,7 +84,7 @@
         return response.json();
       })
       .then(data => {
-        console.log('response data: ', data);
+        console.debug('response data: ', data);
 
         document.getElementById('flag').src = data.newFlagUrl;
         document.getElementById('correct-count-display').textContent = data.correctCount;
@@ -98,7 +98,7 @@
         // Update the options
         data.newOptions.forEach((option, index) => {
           const optionElement = document.getElementById(`option-${index}`);
-          console.log('optionElement:', optionElement);
+          console.debug('optionElement:', optionElement);
           if (optionElement) {
             optionElement.value = option.code;
             optionElement.textContent = option.name;

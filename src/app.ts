@@ -12,7 +12,11 @@ const port = process.env.PORT || 3000;
 let inclusiveCodes: string[] | null = null;
 
 // inclusiveCodes = ['CA', 'CN', 'US', 'JP', 'UK', 'FR', 'GR']; // Test with a subset of countries
-// inclusiveCodes = f.generateEasyDifficultyCodes(); // Test with easy difficulty countries (29)
+// inclusiveCodes = f.generateEasyDifficultyCodes(); // Test with easy difficulty countries (31)
+// inclusiveCodes = f.generateCodesByCountryArea(500000); // Test with countries having areas at least 500,000 km² (53)
+// inclusiveCodes = f.generateCodesByCountryArea(300000); // Test with countries having areas at least 300,000 km² (74)
+// inclusiveCodes = f.generateCodesByCountryArea(100000, 200000); // Test with small countries with having between 100,000 km² and 200,000 km² (23)
+// inclusiveCodes = f.generateCodesByCountryArea(50000, 100000); // Test with small countries with having between 50,000 km² and 100,000 km² (21)
 inclusiveCodes = f.generatePreviousCountryCodes(); // Test with previous countries (189)
 
 const country_code_names: f.CountryCodeName[] = f.load_country_code_names(inclusiveCodes);
