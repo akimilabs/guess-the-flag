@@ -7,36 +7,34 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h1>Guess the Flag</h1>
+  <h1>Guess the Flag From <%= total %> Countries</h1>
   <table border="1" align="center">
     <tr valign="middle"><td width="70%">
-      <img id="flag" src="<%= flagUrl %>" alt="Flag" width="300">
+      <img id="flag" src="<%= flagUrl %>" alt="Flag">
     </td><td>
-      <% if (lastCorrectCountry) { %>
+      <span id="last-guess-box" style="display: none;">
+      <!--% if (lastCorrectCountry) { %-->
         <h4>Last Guess</h4>
-        <% if (lastGuessWasCorrect) { %>
-          <p id="last-guess" style="color: green;">Yes, it was <%= lastCorrectCountry %>!</p>
-        <% } else { %>
-          <p id="last-guess" style="color: red;">No, it was <%= lastCorrectCountry %>.</p>
-        <% } %>
-        <img id="last-flag" src="<%= lastFlagUrl %>" alt="Flag" width="100">
-      <% } %>
+        <p id="last-guess"></p>
+        <img id="last-flag" src="<%= lastFlagUrl %>" alt="Flag">
+      <!--% } %-->
+      </span>
     </td></tr>
-    <tr><td colspan="2"><strong>Scores</strong> Correct: <span id="correct-count"><%= correctCount %></span>, Incorrect: <span id="incorrect-count"><%= incorrectCount %></span>
+    <tr><td colspan="2"><strong>Scores</strong> Correct: <span id="correct-count-display"><%= correctCount %></span>, Incorrect: <span id="incorrect-count-display"><%= incorrectCount %></span>
     </td></tr>
   </table>
 
   <form id="guess-form" action="/guess" method="POST">
-    <input type="hidden" name="countryCode" value="<%= country.code %>">
-    <input type="hidden" name="countryName" value="<%= country.name %>">
-    <input type="hidden" name="correctCount" value="<%= correctCount %>">
-    <input type="hidden" name="incorrectCount" value="<%= incorrectCount %>">
+    <input id="country-code" type="hidden" name="countryCode" value="<%= country.code %>">
+    <input id="country-name" type="hidden" name="countryName" value="<%= country.name %>">
+    <input id="correct-count" type="hidden" name="correctCount" value="<%= correctCount %>">
+    <input id="incorrect-count" type="hidden" name="incorrectCount" value="<%= incorrectCount %>">
     <div>
       <% options.forEach((option, index) => { %>
         <% if (index % 3 === 0) { %>
           <div class="button-row" style="margin-bottom: 10px;">
         <% } %>
-        <button type="submit" name="guessCode" value="<%= option.code %>"><%= option.name %></button>
+        <button id="option-<%= index %>" type="submit" name="guessCode" value="<%= option.code %>"><%= option.name %></button>
         <% if (index % 3 === 2 || index === options.length - 1) { %>
           </div>
         <% } %>
@@ -53,20 +51,68 @@
   <script>
     document.getElementById('guess-form').addEventListener('submit', function(event) {
       event.preventDefault();
+
+      // Convert form data to JSON
       const formData = new FormData(this);
+      const formObject = {};
+      formData.forEach((value, key) => {
+        formObject[key] = value;
+      });
+
+      // Add the guessCode from the clicked button
+      const guessCode = event.submitter.value;
+      formObject['guessCode'] = guessCode;
+
+      console.log('request data:', formObject);
+      console.debug('JSON.stringify(formObject):', JSON.stringify(formObject));
+
       fetch('/guess', {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formObject)
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          const alertMessage = 'Failed to make request to /guess: ' + response.statusText + " (" + response.status + ")";
+          alert(alertMessage);
+          throw new Error(alertMessage);
+        }
+
+        // Parse the JSON response
+        return response.json();
+      })
       .then(data => {
-        document.getElementById('flag').src = data.flagUrl;
-        document.getElementById('correct-count').textContent = data.correctCount;
-        document.getElementById('incorrect-count').textContent = data.incorrectCount;
+        console.log('response data: ', data);
+
+        document.getElementById('flag').src = data.newFlagUrl;
+        document.getElementById('correct-count-display').textContent = data.correctCount;
+        document.getElementById('incorrect-count-display').textContent = data.incorrectCount;
+        document.getElementById('correct-count').value = data.correctCount;
+        document.getElementById('incorrect-count').value = data.incorrectCount;
+        document.getElementById('country-code').value = data.newCountry.code;
+        document.getElementById('country-name').value = data.newCountry.name;
+        document.getElementById('last-guess-box').style.display = 'block';
+
+        // Update the options
+        data.newOptions.forEach((option, index) => {
+          const optionElement = document.getElementById(`option-${index}`);
+          console.log('optionElement:', optionElement);
+          if (optionElement) {
+            optionElement.value = option.code;
+            optionElement.textContent = option.name;
+          }
+        });
+
+        // Update the last guess section
         if (data.lastCorrectCountry) {
           document.getElementById('last-guess').textContent = data.lastGuessWasCorrect ? `Yes, it was ${data.lastCorrectCountry}!` : `No, it was ${data.lastCorrectCountry}.`;
           document.getElementById('last-guess').style.color = data.lastGuessWasCorrect ? 'green' : 'red';
-          document.getElementById('last-flag').src = data.lastFlagUrl;
+          const lastFlagElement = document.getElementById('last-flag');
+          if (lastFlagElement) {
+            lastFlagElement.src = data.lastFlagUrl;
+          }
         }
       });
     });
