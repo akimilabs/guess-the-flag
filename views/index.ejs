@@ -37,7 +37,7 @@
         <% if (index % 3 === 0) { %>
           <div class="button-row">
         <% } %>
-        <button id="option-<%= index %>" type="submit" name="guessCode" value="<%= option.code %>"><%= option.name %></button>
+        <button id="option-<%= index %>" type="submit" name="guessCode" value="<%= option.code %>"><%= option.name %>&nbsp;&nbsp;<a href="#" onclick="speakCountryName('<%= option.name %>');">🔊</a></button>
         <% if (index % 3 === 2 || index === options.length - 1) { %>
           </div>
         <% } %>
@@ -52,8 +52,10 @@
   </form>
 
   <script>
-    // Existing JavaScript code
-    // ...
+    function speakCountryName(countryName) {
+      const msg = new SpeechSynthesisUtterance(countryName);
+      window.speechSynthesis.speak(msg);
+    }
   </script>
 </body>
 </html>
