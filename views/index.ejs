@@ -2,39 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guess the Flag</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h1>Guess the Flag</h1>
-  <table border="1" align="center">
-    <tr valign="middle"><td width="70%">
-      <img src="<%= flagUrl %>" alt="Flag" width="300">
-    </td><td>
-      <% if (lastCorrectCountry) { %>
-        <h4>Last Guess</h4>
-        <% if (lastGuessWasCorrect) { %>
-          <p style="color: green;">Yes, it was <%= lastCorrectCountry %>!</p>
-        <% } else { %>
-          <p style="color: red;">No, it was <%= lastCorrectCountry %>.</p>
-        <% } %>
-        <img src="<%= lastFlagUrl %>" alt="Flag" width="100">
-      <% } %>
-    </td></tr>
-    <tr><td colspan="2"><strong>Scores</strong> Correct: <%= correctCount %>, Incorrect: <%= incorrectCount %>
-    </td></tr>
-    </table>
+  <h1>Guess the Flag From <%= total %> Countries</h1>
+  <table>
+    <tr valign="middle">
+      <td width="70%">
+        <img id="flag" src="<%= flagUrl %>" alt="Flag">
+      </td>
+      <td>
+        <span id="last-guess-box" style="display: none;">
+          <h4>Last Guess</h4>
+          <p id="last-guess"></p>
+          <img id="last-flag" src="<%= lastFlagUrl %>" alt="Flag">
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <strong>Scores</strong> Correct: <span id="correct-count-display"><%= correctCount %></span>, Incorrect: <span id="incorrect-count-display"><%= incorrectCount %></span>
+      </td>
+    </tr>
+  </table>
 
-  <form action="/guess" method="POST">
-    <input type="hidden" name="country" value="<%= country %>">
-    <input type="hidden" name="flagUrl" value="<%= flagUrl %>">
+  <form id="guess-form" action="/guess" method="POST">
+    <input id="country-code" type="hidden" name="countryCode" value="<%= country.code %>">
+    <input id="country-name" type="hidden" name="countryName" value="<%= country.name %>">
+    <input id="correct-count" type="hidden" name="correctCount" value="<%= correctCount %>">
+    <input id="incorrect-count" type="hidden" name="incorrectCount" value="<%= incorrectCount %>">
     <div>
       <% options.forEach((option, index) => { %>
         <% if (index % 3 === 0) { %>
-          <div class="button-row" style="margin-bottom: 10px;">
+          <div class="button-row">
         <% } %>
-        <button type="submit" name="guess" value="<%= option %>"><%= option %></button>
+        <button id="option-<%= index %>" type="submit" name="guessCode" value="<%= option.code %>"><%= option.name %>&nbsp;&nbsp;<a href="#" onclick="speakCountryName('<%= option.name %>');">🔊</a></button>
         <% if (index % 3 === 2 || index === options.length - 1) { %>
           </div>
         <% } %>
@@ -43,9 +46,16 @@
   </form>
 
   <hr>
-  
+
   <form action="/reset" method="POST">
-    <button type="submit">Reset Scores</button>
+    <button type="submit">Restart</button>
   </form>
+
+  <script>
+    function speakCountryName(countryName) {
+      const msg = new SpeechSynthesisUtterance(countryName);
+      window.speechSynthesis.speak(msg);
+    }
+  </script>
 </body>
 </html>
