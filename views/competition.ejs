@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Competition</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Competition ID: <%= competitionId %></h1>
+  <h2>Player: <%= playerName %></h2>
+
+  <% if (isHost) { %>
+    <button id="start-competition">Start Competition</button>
+  <% } else { %>
+    <p>Waiting for the host to start the competition...</p>
+  <% } %>
+
+  <div id="game-area" style="display: none;">
+    <h3>Round <span id="round-number"></span></h3>
+    <img id="flag-image" src="" alt="Flag">
+    <div id="options-container" class="button-row"></div>
+  </div>
+
+  <div id="results-area" style="display: none;">
+    <h3>Round Results</h3>
+    <p>Correct Answer: <span id="correct-answer"></span></p>
+    <h4>Scores:</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="scores-list"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // Existing JavaScript code remains the same
+    // ...
+  </script>
+</body>
+</html>
