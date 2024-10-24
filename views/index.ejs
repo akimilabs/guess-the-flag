@@ -16,7 +16,7 @@
       <!--% if (lastCorrectCountry) { %-->
         <h4>Last Guess</h4>
         <p id="last-guess"></p>
-        <img id="last-flag" src="<%= lastFlagUrl %>" alt="Flag">
+        <img id="last-flag" src="<%= lastFlagUrl %>" alt="Flag" style="cursor: pointer;">
       <!--% } %-->
       </span>
     </td></tr>
@@ -112,10 +112,16 @@
           const lastFlagElement = document.getElementById('last-flag');
           if (lastFlagElement) {
             lastFlagElement.src = data.lastFlagUrl;
+            lastFlagElement.onclick = () => speakCountryName(data.lastCorrectCountry);
           }
         }
       });
     });
+
+    function speakCountryName(countryName) {
+      const msg = new SpeechSynthesisUtterance(countryName);
+      window.speechSynthesis.speak(msg);
+    }
   </script>
 </body>
 </html>
