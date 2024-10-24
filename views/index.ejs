@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guess the Flag</title>
+  <style>
+    .speaker-icon {
+        font-size: 24px; /* Adjust the size as needed */
+    }
+  </style>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -19,7 +24,7 @@
         <% } else { %>
           <p style="color: red;">No, it was <%= lastCorrectCountry %>.</p>
         <% } %>
-        <img src="<%= lastFlagUrl %>" alt="Flag" width="100">
+        <img src="<%= lastFlagUrl %>" alt="Flag" width="100" onclick="speakCountryName('<%= lastCorrectCountry %>')" style="cursor: pointer;">
       <% } %>
     </td></tr>
     <tr><td colspan="2"><strong>Scores</strong> Correct: <%= correctCount %>, Incorrect: <%= incorrectCount %>
@@ -34,7 +39,7 @@
         <% if (index % 3 === 0) { %>
           <div class="button-row" style="margin-bottom: 10px;">
         <% } %>
-        <button type="submit" name="guess" value="<%= option %>"><%= option %></button>
+        <button type="submit" name="guess" value="<%= option %>"><%= option %>&nbsp;&nbsp;<a href="#" class="speaker-icon" onclick="speakCountryName('<%= option %>');">🔊</a></button>
         <% if (index % 3 === 2 || index === options.length - 1) { %>
           </div>
         <% } %>
@@ -47,5 +52,12 @@
   <form action="/reset" method="POST">
     <button type="submit">Reset Scores</button>
   </form>
+
+  <script>
+    function speakCountryName(countryName) {
+      const msg = new SpeechSynthesisUtterance(countryName);
+      window.speechSynthesis.speak(msg);
+    }
+  </script>
 </body>
 </html>
